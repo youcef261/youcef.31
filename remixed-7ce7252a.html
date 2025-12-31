@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>علم الفلك والرياضيات الكونية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1438 50%, #2d1b4e 100%);
+            color: #fff;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        #custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: all 0.1s ease;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        #custom-cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            background: #00d4ff;
+            border-radius: 50%;
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            background: rgba(0, 212, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: scale(2);
+            }
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 80px 20px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 4em;
+            background: linear-gradient(45deg, #00d4ff, #b900ff, #ff006e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            color: #a0a0ff;
+            margin-bottom: 10px;
+        }
+
+        .math-formula {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            color: #00d4ff;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .math-formula:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .section {
+            margin: 60px 0;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .section:hover::before {
+            opacity: 1;
+        }
+
+        .section:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+
+        h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            text-align: center;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #e0e0ff;
+            margin-bottom: 15px;
+        }
+
+        .planet-card {
+            display: inline-block;
+            margin: 15px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(185, 0, 255, 0.2) 100%);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .planet-card:hover {
+            transform: scale(1.1) rotate(2deg);
+            border-color: #00d4ff;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+        }
+
+        .equation-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-right: 5px solid #00d4ff;
+            transition: all 0.3s ease;
+        }
+
+        .equation-box:hover {
+            background: rgba(0, 0, 0, 0.6);
+            transform: translateX(-10px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            margin-top: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .creator {
+            font-size: 1.5em;
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .interactive-sphere {
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #00d4ff, #1a0033);
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.5);
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .interactive-sphere:hover {
+            transform: scale(1.2) translateY(-20px);
+            box-shadow: 0 0 80px rgba(0, 212, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="custom-cursor"></div>
+    <canvas id="starfield"></canvas>
+
+    <div class="container">
+        <header>
+            <h1>رحلة في الكون والرياضيات</h1>
+            <p class="subtitle">استكشف جمال الفلك من خلال المعادلات الرياضية</p>
+            <div class="interactive-sphere"></div>
+        </header>
+
+        <section class="section">
+            <h2>🌌 قوانين كبلر للحركة الكوكبية</h2>
+            <p>اكتشف يوهانس كبلر ثلاثة قوانين تحكم حركة الكواكب حول الشمس، مستخدماً الرياضيات لفهم الكون.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    القانون الثالث لكبلر: T² ∝ a³
+                </div>
+                <p>حيث T هي الفترة المدارية و a نصف المحور الرئيسي للمدار</p>
+            </div>
+
+            <div class="planet-card">🌍 الأرض</div>
+            <div class="planet-card">🪐 زحل</div>
+            <div class="planet-card">♃ المشتري</div>
+            <div class="planet-card">♂ المريخ</div>
+        </section>
+
+        <section class="section">
+            <h2>⭐ معادلة آينشتاين للطاقة</h2>
+            <p>أشهر معادلة في الفيزياء تربط بين الكتلة والطاقة في الكون.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    E = mc²
+                </div>
+                <p>الطاقة = الكتلة × مربع سرعة الضوء</p>
+                <p>هذه المعادلة تفسر كيف تولد النجوم طاقتها الهائلة من خلال الاندماج النووي.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌙 قانون الجذب العام لنيوتن</h2>
+            <p>القوة التي تحكم حركة الأجرام السماوية في الكون.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    F = G × (m₁ × m₂) / r²
+                </div>
+                <p>حيث G ثابت الجذب العام، m₁ و m₂ كتلتا الجسمين، و r المسافة بينهما</p>
+                <p>هذا القانون يفسر لماذا تدور الأرض حول الشمس والقمر حول الأرض!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔭 معادلة هابل للتوسع الكوني</h2>
+            <p>اكتشاف مذهل يثبت أن الكون يتوسع باستمرار.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    v = H₀ × d
+                </div>
+                <p>السرعة = ثابت هابل × المسافة</p>
+                <p>المجرات البعيدة تبتعد عنا بسرعة تتناسب مع بعدها عنا.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>✨ نصف قطر شوارتزشيلد - الثقوب السوداء</h2>
+            <p>الرياضيات التي تصف أكثر الأجسام غموضاً في الكون.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    rs = 2GM / c²
+                </div>
+                <p>نصف قطر أفق الحدث للثقب الأسود</p>
+                <p>إذا ضغطت كتلة ما داخل هذا النصف، لن يستطيع حتى الضوء الهروب منها!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌠 معادلة دريك - البحث عن حياة خارج الأرض</h2>
+            <p>معادلة تقدر عدد الحضارات القادرة على التواصل في مجرتنا.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    N = R★ × fp × ne × fl × fi × fc × L
+                </div>
+                <p>حيث N عدد الحضارات في مجرة درب التبانة</p>
+                <p>هذه المعادلة تجمع احتمالات تكون النجوم والكواكب والحياة الذكية!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>💫 معادلة الزمكان - النسبية العامة</h2>
+            <p>المعادلة التي تصف كيف تنحني المادة والطاقة نسيج الزمان والمكان.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    Gμν + Λgμν = (8πG/c⁴)Tμν
+                </div>
+                <p>معادلة آينشتاين للمجال في النسبية العامة</p>
+                <p>الجانب الأيسر يصف انحناء الزمكان، والجانب الأيمن يصف المادة والطاقة.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌌 معادلة فريدمان - توسع الكون</h2>
+            <p>المعادلة التي تحكم كيفية تطور الكون منذ الانفجار العظيم.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    (ȧ/a)² = (8πG/3)ρ - k/a² + Λ/3
+                </div>
+                <p>معادلة توسع الكون حيث a(t) معامل القياس</p>
+                <p>تخبرنا هذه المعادلة عن مصير الكون - هل سيتوسع للأبد أم سينكمش؟</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚡ معادلة شرودنغر الكونية</h2>
+            <p>ميكانيكا الكم تلتقي بالكونيات في وصف الموجات الكونية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    iℏ ∂ψ/∂t = Ĥψ
+                </div>
+                <p>معادلة شرودنغر التي تصف تطور الأنظمة الكمومية</p>
+                <p>حتى الكون في بداياته كان يخضع لقوانين ميكانيكا الكم!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔥 قانون ستيفان-بولتزمان - إشعاع النجوم</h2>
+            <p>القانون الذي يحدد كمية الطاقة التي تشعها النجوم.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    P = σAT⁴
+                </div>
+                <p>القدرة الإشعاعية = ثابت ستيفان × المساحة × (درجة الحرارة)⁴</p>
+                <p>هذا يفسر لماذا النجوم الأكثر حرارة هي الأكثر لمعاناً!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌊 معادلة موجة شرودنغر للكون المبكر</h2>
+            <p>وصف كمومي للكون في لحظاته الأولى بعد الانفجار العظيم.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    Ĥψ = Eψ
+                </div>
+                <p>معادلة القيمة الذاتية للطاقة في الأنظمة الكمومية</p>
+                <p>الكون نفسه بدأ كحالة كمومية قبل أن يتطور إلى ما نراه اليوم!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎯 معادلة لورنتز للتحويل النسبي</h2>
+            <p>كيف يتغير الزمان والمكان عند السرعات القريبة من سرعة الضوء.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    t' = γ(t - vx/c²)
+                    <br>
+                    x' = γ(x - vt)
+                    <br>
+                    γ = 1/√(1 - v²/c²)
+                </div>
+                <p>تحويلات لورنتز - أساس النسبية الخاصة</p>
+                <p>عند السفر بسرعات عالية، يتباطأ الزمن ويتقلص الطول!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌡️ قانون فين للإزاحة</h2>
+            <p>العلاقة بين درجة حرارة النجم ولون الضوء الذي يصدره.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    λmax = b/T
+                </div>
+                <p>الطول الموجي الأعظمي = ثابت فين / درجة الحرارة</p>
+                <p>النجوم الزرقاء أكثر حرارة من النجوم الحمراء!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>💥 معادلة تشاندراسيخار - حد كتلة النجوم</h2>
+            <p>الحد الأقصى لكتلة القزم الأبيض قبل أن ينهار إلى نجم نيوتروني.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    Mch ≈ 1.4 M☉
+                </div>
+                <p>حد تشاندراسيخار ≈ 1.4 ضعف كتلة الشمس</p>
+                <p>إذا تجاوز القزم الأبيض هذا الحد، سينهار بعنف!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔮 معادلة هايزنبرغ للشك</h2>
+            <p>المبدأ الأساسي في ميكانيكا الكم - لا يمكن معرفة كل شيء بدقة!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ΔxΔp ≥ ℏ/2
+                </div>
+                <p>عدم التأكد في الموضع × عدم التأكد في الزخم ≥ ثابت بلانك المختزل</p>
+                <p>كلما عرفت موقع الجسيم بدقة، قلت معرفتك بسرعته!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌀 معادلة الزخم الزاوي المحفوظ</h2>
+            <p>لماذا تدور المجرات والكواكب والنجوم - قانون الحفظ الكوني.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    L = Iω = mvr
+                </div>
+                <p>الزخم الزاوي = عزم القصور الذاتي × السرعة الزاوية</p>
+                <p>هذا القانون يفسر لماذا تدور الراقصة أسرع عندما تقرب ذراعيها!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎆 معادلة إشعاع هاوكينج - الثقوب السوداء تتبخر!</h2>
+            <p>اكتشاف مذهل: الثقوب السوداء ليست سوداء تماماً!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    T = ℏc³/(8πGMkB)
+                </div>
+                <p>درجة حرارة هاوكينج للثقب الأسود</p>
+                <p>الثقوب السوداء تشع طاقة وتتبخر ببطء شديد عبر تريليونات السنين!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌏 معادلة الهروب من الجاذبية</h2>
+            <p>السرعة المطلوبة للهروب من جاذبية جسم سماوي.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    vesc = √(2GM/r)
+                </div>
+                <p>سرعة الهروب من الأرض = 11.2 كم/ثانية</p>
+                <p>أي شيء أبطأ من هذا سيعود للأرض - حتى الصواريخ!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>✴️ معادلة أويلر - أجمل معادلة في الرياضيات</h2>
+            <p>تربط بين خمسة أهم أعداد في الرياضيات بطريقة سحرية!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    e^(iπ) + 1 = 0
+                </div>
+                <p>تجمع: e (النمو)، i (التخيل)، π (الدائرة)، 1 (الوحدة)، 0 (العدم)</p>
+                <p>هذه المعادلة تظهر الجمال الخفي في الكون الرياضي!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌑 معادلة انحراف الضوء بالجاذبية</h2>
+            <p>كيف تنحني أشعة الضوء عند مرورها بالقرب من النجوم الضخمة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    θ = 4GM/(c²b)
+                </div>
+                <p>زاوية الانحراف = 4 × ثابت الجذب × الكتلة / (سرعة الضوء² × معامل التصادم)</p>
+                <p>الشمس تنحني الضوء بزاوية 1.75 ثانية قوسية - أول دليل على النسبية العامة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎨 معادلة إزاحة دوبلر الكونية</h2>
+            <p>كيف نعرف أن المجرات تبتعد عنا - قياس توسع الكون.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    z = Δλ/λ₀ = v/c
+                </div>
+                <p>الانزياح الأحمر = التغير في الطول الموجي / الطول الموجي الأصلي</p>
+                <p>المجرات البعيدة تظهر أكثر احمراراً لأنها تهرب منا!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚛️ معادلة بلانك للطاقة الكمومية</h2>
+            <p>بداية ثورة ميكانيكا الكم - الطاقة تأتي في حزم منفصلة!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    E = hf = hc/λ
+                </div>
+                <p>طاقة الفوتون = ثابت بلانك × التردد</p>
+                <p>الضوء الأزرق يحمل طاقة أكبر من الضوء الأحمر!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌪️ معادلة الزمن في الثقب الأسود</h2>
+            <p>تمدد الزمن الشديد بالقرب من أفق الحدث.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    t = t₀/√(1 - 2GM/(rc²))
+                </div>
+                <p>الزمن يتباطأ كلما اقتربت من الثقب الأسود</p>
+                <p>عند أفق الحدث، يتوقف الزمن تماماً من وجهة نظر المراقب الخارجي!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔭 معادلة المسافة الفلكية بالفرسخ</h2>
+            <p>كيف يقيس الفلكيون المسافات الكونية الشاسعة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    d(pc) = 1/p(arcsec)
+                </div>
+                <p>المسافة بالفرسخ = 1 / زاوية الاختلاف بالثانية القوسية</p>
+                <p>الفرسخ الفلكي = 3.26 سنة ضوئية = 30.9 تريليون كيلومتر!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>💡 معادلة لمعان النجم الظاهري</h2>
+            <p>العلاقة بين اللمعان الحقيقي للنجم والمسافة منه.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    m - M = 5log₁₀(d) - 5
+                </div>
+                <p>القدر الظاهري - القدر المطلق = 5 × لوغاريتم المسافة - 5</p>
+                <p>هذه المعادلة تخبرنا عن بعد النجوم من لمعانها!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌟 معادلة الاندماج النووي في النجوم</h2>
+            <p>كيف تحول النجوم الهيدروجين إلى هيليوم وتنتج الطاقة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    4¹H → ⁴He + 2e⁺ + 2ν + 26.7 MeV
+                </div>
+                <p>أربع ذرات هيدروجين تندمج لتكوين هيليوم + طاقة هائلة</p>
+                <p>كل ثانية، الشمس تحول 600 مليون طن من الهيدروجين إلى هيليوم!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎭 معادلة كثافة الطاقة الحرجة للكون</h2>
+            <p>الكثافة التي تحدد شكل ومصير الكون - مسطح، مفتوح، أم مغلق؟</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ρc = 3H²/(8πG)
+                </div>
+                <p>الكثافة الحرجة ≈ 10⁻²⁶ كجم/م³</p>
+                <p>إذا كانت كثافة الكون أكبر من هذا، سينهار في النهاية!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌈 معادلة الطيف الكهرومغناطيسي</h2>
+            <p>العلاقة الأساسية بين الطول الموجي والتردد والطاقة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    c = λf
+                </div>
+                <p>سرعة الضوء = الطول الموجي × التردد</p>
+                <p>من موجات الراديو إلى أشعة غاما - كلها ضوء بأطوال موجية مختلفة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎪 معادلة نصف قطر بوهر للذرة</h2>
+            <p>أول نموذج كمومي ناجح للذرة - حيث تبدأ رحلة فهم المادة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    r₁ = ℏ²/(mₑe²kₑ) ≈ 0.529 Å
+                </div>
+                <p>نصف قطر بوهر - أصغر مدار للإلكترون حول النواة</p>
+                <p>الذرات صغيرة جداً - 10 مليار ذرة في خط بطول 1 متر!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🚀 معادلة تسيولكوفسكي للصواريخ</h2>
+            <p>المعادلة الأساسية لكل رحلات الفضاء - من الأرض إلى القمر!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    Δv = vₑ ln(m₀/mf)
+                </div>
+                <p>التغير في السرعة = سرعة العادم × لوغاريتم نسبة الكتل</p>
+                <p>لهذا السبب معظم وزن الصاروخ هو وقود - للوصول إلى الفضاء!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌊 معادلة موجة دي برولي</h2>
+            <p>كل جسيم في الكون له طبيعة موجية - الموجات والجسيمات وجهان لعملة واحدة!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    λ = h/p = h/(mv)
+                </div>
+                <p>الطول الموجي = ثابت بلانك / الزخم</p>
+                <p>حتى أنت لديك طول موجي، لكنه صغير جداً لا يمكن ملاحظته!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚡ معادلة ماكسويل للمجال الكهرومغناطيسي</h2>
+            <p>المعادلات الأربع التي توحد الكهرباء والمغناطيسية والضوء!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ∇·E = ρ/ε₀
+                    <br>
+                    ∇·B = 0
+                    <br>
+                    ∇×E = -∂B/∂t
+                    <br>
+                    ∇×B = μ₀J + μ₀ε₀∂E/∂t
+                </div>
+                <p>معادلات ماكسويل - أساس الكهرومغناطيسية</p>
+                <p>هذه المعادلات تفسر الضوء، الراديو، الأشعة السينية، وكل الموجات الكهرومغناطيسية!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌀 معادلة الانحناء الزمكاني - متر شوارتزشيلد</h2>
+            <p>المعادلة الدقيقة لشكل الزمكان حول جسم كروي ضخم.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ds² = -(1-2GM/rc²)c²dt² + (1-2GM/rc²)⁻¹dr² + r²dΩ²
+                </div>
+                <p>متر شوارتزشيلد - الحل الأول لمعادلات آينشتاين</p>
+                <p>يصف الزمكان حول النجوم والكواكب والثقوب السوداء!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎯 معادلة بولتزمان للإنتروبيا</h2>
+            <p>القانون الثاني للديناميكا الحرارية - الكون يتجه نحو الفوضى!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    S = kB ln(Ω)
+                </div>
+                <p>الإنتروبيا = ثابت بولتزمان × لوغاريتم عدد الحالات الممكنة</p>
+                <p>هذه المعادلة محفورة على قبر بولتزمان - تربط الفوضى بالاحتمالية!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>💫 معادلة نسبية الطاقة الكلية</h2>
+            <p>العلاقة الكاملة بين الطاقة والكتلة والزخم في النسبية الخاصة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    E² = (pc)² + (mc²)²
+                </div>
+                <p>الطاقة الكلية = √(طاقة الحركة² + طاقة الكتلة²)</p>
+                <p>عند السكون (p=0)، تبسط إلى المعادلة الشهيرة E=mc²!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔬 معادلة ديراك للإلكترون النسبي</h2>
+            <p>المعادلة التي تنبأت بوجود المادة المضادة - أحد أعظم التنبؤات العلمية!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    (iγμ∂μ - m)ψ = 0
+                </div>
+                <p>معادلة ديراك - تدمج ميكانيكا الكم مع النسبية الخاصة</p>
+                <p>تنبأت بوجود البوزيترون قبل اكتشافه بسنوات!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌡️ معادلة الحرارة النوعية عند درجة الحرارة المنخفضة</h2>
+            <p>قانون ديباي - كيف تتصرف المواد عند الاقتراب من الصفر المطلق.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    Cv = (12π⁴/5)NkB(T/ΘD)³
+                </div>
+                <p>الحرارة النوعية تتناسب مع T³ عند درجات الحرارة المنخفضة جداً</p>
+                <p>عند الصفر المطلق، تتوقف كل الذرات عن الاهتزاز!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎨 معادلة الفوتون الافتراضي في الكهروديناميك الكمي</h2>
+            <p>كيف تتفاعل الجسيمات المشحونة - عبر تبادل فوتونات افتراضية!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ΔE·Δt ≥ ℏ/2
+                </div>
+                <p>الفوتونات الافتراضية يمكنها "استعارة" الطاقة لفترة قصيرة جداً</p>
+                <p>هذا يفسر كيف تتنافر الإلكترونات - بتبادل فوتونات لا يمكن رؤيتها!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌌 معادلة كثافة الطاقة المظلمة</h2>
+            <p>الطاقة الغامضة التي تسرّع توسع الكون - 68% من كل شيء!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ρΛ = Λc²/(8πG) ≈ 6×10⁻¹⁰ J/m³
+                </div>
+                <p>كثافة الطاقة المظلمة من الثابت الكوني Λ</p>
+                <p>لا نعرف ما هي حقاً، لكنها تمزق الكون بعيداً!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚛️ معادلة الاضمحلال الإشعاعي</h2>
+            <p>كيف تتحلل النوى الذرية غير المستقرة عبر الزمن - أساس التأريخ الكربوني!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    N(t) = N₀e^(-λt)
+                    <br>
+                    t₁/₂ = ln(2)/λ
+                </div>
+                <p>عدد النوى المتبقية = العدد الأولي × e^(-معدل الاضمحلال × الزمن)</p>
+                <p>الكربون-14 له نصف عمر 5730 سنة - يستخدم لتأريخ الآثار القديمة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔥 معادلة سالام-واينبرغ للتفاعل الكهروضعيف</h2>
+            <p>توحيد القوة الكهرومغناطيسية والقوة النووية الضعيفة - جائزة نوبل!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    sin²θW = 1 - (MW/MZ)² ≈ 0.23
+                </div>
+                <p>زاوية واينبرغ تربط بين كتل بوزونات W و Z</p>
+                <p>عند طاقات عالية جداً، تندمج قوتان من قوى الطبيعة الأربع!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌪️ معادلة كاسيمير للطاقة الصفرية</h2>
+            <p>حتى الفراغ ليس فارغاً تماماً - طاقة تنبثق من العدم!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    F/A = -π²ℏc/(240d⁴)
+                </div>
+                <p>قوة كاسيمير لكل وحدة مساحة بين صفيحتين متوازيتين</p>
+                <p>الفراغ الكمومي يمارس ضغطاً حقيقياً يمكن قياسه - الفراغ نابض بالحياة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎆 معادلة درجة حرارة أونروه</h2>
+            <p>المراقب المتسارع يرى الفراغ ساخناً - النسبية تلتقي بالديناميكا الحرارية!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    T = ℏa/(2πckB)
+                </div>
+                <p>درجة الحرارة التي يراها المراقب المتسارع في الفراغ</p>
+                <p>إذا تسارعت بقوة كافية، سترى الفضاء الفارغ يتوهج!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌊 معادلة الموجات الثقالية</h2>
+            <p>تموجات في نسيج الزمكان تسافر بسرعة الضوء - أصداء الكون العنيفة!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    h ~ (G/c⁴) × (d²Q/dt²) / r
+                </div>
+                <p>سعة الموجة الثقالية تتناسب مع عزم رباعي القطب للمصدر</p>
+                <p>اصطدام الثقوب السوداء يهز الكون بأكمله - اكتشفنا هذا عام 2015!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔮 معادلة فيرمي-ديراك للإلكترونات</h2>
+            <p>كيف تتوزع الإلكترونات في المعادن - لا إلكترونان في نفس الحالة!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    f(E) = 1/(e^((E-μ)/kBT) + 1)
+                </div>
+                <p>دالة التوزيع لفرميونات - جسيمات تطيع مبدأ استبعاد باولي</p>
+                <p>هذا يفسر لماذا المعادن توصل الكهرباء والحرارة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚡ معادلة لامب شيفت في الذرة</h2>
+            <p>تصحيح كمومي دقيق لمستويات طاقة الهيدروجين - دليل على الكهروديناميك الكمي!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ΔE ≈ (α⁵mec²/π) × ln(1/α) / n³
+                </div>
+                <p>إزاحة لامب - فرق الطاقة بين مستويات 2S و 2P</p>
+                <p>الفوتونات الافتراضية تغير طاقة الإلكترون قليلاً - قياس بدقة مذهلة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌟 معادلة الحد الأقصى لكتلة النجم النيوتروني</h2>
+            <p>حد تولمان-أوبنهايمر-فولكوف - أثقل نجم نيوتروني ممكن قبل الانهيار!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    MTOV ≈ 2-3 M☉
+                </div>
+                <p>الحد الأقصى لكتلة النجم النيوتروني قبل أن يصبح ثقباً أسود</p>
+                <p>أثقل من هذا، لا شيء يستطيع إيقاف الانهيار الجذبي!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>💫 معادلة سرعة الانجراف الجاذبي</h2>
+            <p>كيف تتباطأ الأجسام الثنائية بسبب إشعاع الموجات الثقالية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    df/dt = (96π/5)(πf)^(11/3)(GM/c³)^(5/3)
+                </div>
+                <p>معدل زيادة التردد المدارى للنظام الثنائي</p>
+                <p>الثقوب السوداء تقترب أسرع فأسرع حتى تندمج في لحظة واحدة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎨 معادلة زيمان للانشطار الطيفي</h2>
+            <p>كيف تنقسم الخطوط الطيفية في المجال المغناطيسي - نافذة على النجوم المغناطيسية!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ΔE = μB B mJ
+                </div>
+                <p>تأثير زيمان - انشطار مستويات الطاقة في المجال المغناطيسي</p>
+                <p>هكذا نقيس المجالات المغناطيسية الهائلة للنجوم البعيدة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌌 معادلة ساها للتأين الحراري</h2>
+            <p>كم من الذرات متأينة في درجة حرارة معينة - مفتاح لفهم أطياف النجوم!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    (Ni+1/Ni) = (2Zi+1/Zi)(2πmekBT/h²)^(3/2) × e^(-χi/kBT)/ne
+                </div>
+                <p>معادلة ساها - نسبة التأين في البلازما الحرارية</p>
+                <p>من هذه المعادلة نعرف درجة حرارة النجوم من ألوانها!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚛️ معادلة الكتلة النووية شبه التجريبية</h2>
+            <p>صيغة فايزساكر - كيف نحسب كتلة أي نواة ذرية!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    BE = avA - asA^(2/3) - acZ²/A^(1/3) - aa(N-Z)²/A + δ(A,Z)
+                </div>
+                <p>طاقة الربط النووية من نموذج القطرة السائلة</p>
+                <p>النواة الذرية تتصرف كقطرة سائل من البروتونات والنيوترونات!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎯 معادلة رذرفورد للتشتت</h2>
+            <p>كيف اكتشفنا النواة الذرية - من تجربة رقائق الذهب الشهيرة!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    dσ/dΩ = (Z₁Z₂e²/4E)² × 1/sin⁴(θ/2)
+                </div>
+                <p>المقطع العرضي التفاضلي لتشتت رذرفورد</p>
+                <p>معظم الجسيمات ألفا تمر، لكن القليل يرتد - فيه النواة الصغيرة الكثيفة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌊 معادلة بيكريل للنشاط الإشعاعي</h2>
+            <p>قياس معدل التفكك النووي - وحدة البيكريل تخلد ذكرى مكتشف النشاط الإشعاعي!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    A = λN = (ln2/t₁/₂) × N
+                </div>
+                <p>النشاط الإشعاعي = معدل الاضمحلال × عدد النوى</p>
+                <p>1 بيكريل = تفكك واحد في الثانية - مارى كوري اكتشفت هذا الإشعاع!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>✨ معادلة براغ للحيود الأشعة السينية</h2>
+            <p>كيف نرى ترتيب الذرات في البلورات - مفتاح علم المواد الحديث!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    nλ = 2d sinθ
+                </div>
+                <p>قانون براغ للحيود - شرط التداخل البناء للأشعة السينية</p>
+                <p>بهذه المعادلة البسيطة اكتشفنا بنية DNA والبروتينات!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔥 معادلة جيبس للطاقة الحرة</h2>
+            <p>هل التفاعل الكيميائي سيحدث تلقائياً أم لا؟ هذه المعادلة تجيب!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ΔG = ΔH - TΔS
+                </div>
+                <p>التغير في طاقة جيبس = التغير في الإنثالبي - (الحرارة × التغير في الإنتروبيا)</p>
+                <p>إذا كان ΔG سالباً، التفاعل يحدث تلقائياً - قلب الكيمياء!</p>
+            </div>
+        </section>
+
+        <section class="section" style="border: 3px solid #FFD700;">
+            <h2>📚 قوانين المنهج الجزائري - الفيزياء</h2>
+            <p style="color: #FFD700; font-size: 1.3em; font-weight: bold;">القوانين الأساسية في الفيزياء للمنهج الجزائري</p>
+        </section>
+
+        <section class="section">
+            <h2>⚡ قانون أوم - الكهرباء</h2>
+            <p>القانون الأساسي للدوائر الكهربائية - العلاقة بين الجهد والتيار والمقاومة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    U = R × I
+                </div>
+                <p>الجهد الكهربائي (V) = المقاومة (Ω) × شدة التيار (A)</p>
+                <p>أيضاً: R = U/I و I = U/R</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔋 قانون جول - الطاقة الكهربائية</h2>
+            <p>الطاقة المستهلكة في الدوائر الكهربائية والقدرة الكهربائية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    W = U × I × t
+                    <br>
+                    P = U × I = R × I² = U²/R
+                </div>
+                <p>الطاقة (J) = الجهد × التيار × الزمن</p>
+                <p>القدرة (W) = الجهد × التيار</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🧲 قانون لابلاس - القوة المغناطيسية</h2>
+            <p>القوة المؤثرة على سلك يحمل تياراً في مجال مغناطيسي.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    F = B × I × L × sin(θ)
+                </div>
+                <p>القوة (N) = شدة المجال المغناطيسي (T) × التيار (A) × الطول (m) × جيب الزاوية</p>
+                <p>عندما يكون السلك عمودياً على المجال: F = B × I × L</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📊 قانون الحركة المستقيمة المتغيرة</h2>
+            <p>معادلات الحركة الأساسية في الميكانيك.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    V = V₀ + a×t
+                    <br>
+                    X = X₀ + V₀×t + ½a×t²
+                    <br>
+                    V² = V₀² + 2a×d
+                </div>
+                <p>V: السرعة النهائية، V₀: السرعة الابتدائية، a: التسارع، t: الزمن</p>
+                <p>X: الموضع، d: المسافة المقطوعة</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚖️ قانون نيوتن الثاني</h2>
+            <p>العلاقة بين القوة والكتلة والتسارع - أساس الديناميك.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    F = m × a
+                </div>
+                <p>القوة (N) = الكتلة (kg) × التسارع (m/s²)</p>
+                <p>مجموع القوى: ΣF = m × a</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚡ قانون الطاقة الحركية</h2>
+            <p>طاقة الجسم المتحرك ومبدأ انحفاظ الطاقة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    Ec = ½ m × V²
+                    <br>
+                    Ep = m × g × h
+                    <br>
+                    Em = Ec + Ep
+                </div>
+                <p>Ec: الطاقة الحركية، Ep: طاقة الوضع، Em: الطاقة الميكانيكية</p>
+                <p>g = 9.81 m/s² (تسارع الجاذبية الأرضية)</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔄 قانون الشغل والقدرة الميكانيكية</h2>
+            <p>الشغل المنجز من طرف قوة والقدرة الميكانيكية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    W = F × d × cos(α)
+                    <br>
+                    P = W/t = F × V
+                </div>
+                <p>الشغل (J) = القوة × المسافة × جيب تمام الزاوية</p>
+                <p>القدرة (W) = الشغل / الزمن</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌊 قانون الدفع والزخم</h2>
+            <p>الزخم وانحفاظه في التصادمات.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    P = m × V
+                    <br>
+                    I = F × Δt = ΔP
+                    <br>
+                    P₁ + P₂ = P'₁ + P'₂
+                </div>
+                <p>الزخم (kg·m/s) = الكتلة × السرعة</p>
+                <p>الدفع = القوة × الزمن = التغير في الزخم</p>
+                <p>مبدأ انحفاظ الزخم في التصادمات</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎯 قانون الجاذبية الكونية</h2>
+            <p>قانون نيوتن للجذب بين الكتل.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    F = G × (m₁ × m₂)/r²
+                    <br>
+                    g = G × M/R²
+                </div>
+                <p>G = 6.67 × 10⁻¹¹ N·m²/kg² (ثابت الجذب العام)</p>
+                <p>g: شدة مجال الجاذبية (m/s²)</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📡 قانون الحركة الدائرية المنتظمة</h2>
+            <p>الحركة في مسار دائري بسرعة ثابتة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    V = 2πR/T = ωR
+                    <br>
+                    ω = 2π/T = 2πf
+                    <br>
+                    a = V²/R = ω²R
+                </div>
+                <p>V: السرعة الخطية، ω: السرعة الزاوية (rad/s)</p>
+                <p>T: الدور الزمني، f: التردد، a: التسارع المركزي</p>
+            </div>
+        </section>
+
+        <section class="section" style="border: 3px solid #00FF88;">
+            <h2>🧪 قوانين المنهج الجزائري - الكيمياء</h2>
+            <p style="color: #00FF88; font-size: 1.3em; font-weight: bold;">القوانين الأساسية في الكيمياء للمنهج الجزائري</p>
+        </section>
+
+        <section class="section">
+            <h2>⚗️ قانون الكتلة المولية</h2>
+            <p>العلاقة بين الكتلة وعدد المولات.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    n = m/M
+                    <br>
+                    N = n × NA
+                </div>
+                <p>n: عدد المولات (mol)، m: الكتلة (g)، M: الكتلة المولية (g/mol)</p>
+                <p>N: عدد الجزيئات، NA = 6.02 × 10²³ mol⁻¹ (عدد أفوجادرو)</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>💧 قانون التركيز المولي</h2>
+            <p>تركيز المحاليل الكيميائية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    C = n/V
+                    <br>
+                    C = m/(M×V)
+                    <br>
+                    n = C × V
+                </div>
+                <p>C: التركيز المولي (mol/L)، n: عدد المولات، V: الحجم (L)</p>
+                <p>التخفيف: C₁V₁ = C₂V₂</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔬 قانون الغازات المثالية</h2>
+            <p>معادلة الحالة للغازات المثالية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    PV = nRT
+                    <br>
+                    Vm = V/n = RT/P
+                </div>
+                <p>P: الضغط (Pa)، V: الحجم (m³)، n: عدد المولات</p>
+                <p>R = 8.314 J/(mol·K)، T: درجة الحرارة المطلقة (K)</p>
+                <p>Vm: الحجم المولي، في الشروط النظامية Vm = 22.4 L/mol</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚡ قانون pH والحموضة</h2>
+            <p>قياس حموضة وقاعدية المحاليل.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    pH = -log[H₃O⁺]
+                    <br>
+                    [H₃O⁺] = 10⁻ᵖᴴ
+                    <br>
+                    pH + pOH = 14
+                    <br>
+                    Ke = [H₃O⁺][OH⁻] = 10⁻¹⁴
+                </div>
+                <p>pH < 7: محلول حمضي، pH = 7: محلول متعادل، pH > 7: محلول قاعدي</p>
+                <p>Ke: جداء الأيونية للماء عند 25°C</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔋 قانون الموصلية الكهربائية</h2>
+            <p>قياس قدرة المحلول على توصيل التيار الكهربائي.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    σ = G × (L/S)
+                    <br>
+                    G = 1/R
+                    <br>
+                    σ = Σλᵢ[Xᵢ]
+                </div>
+                <p>σ: الناقلية (S/m)، G: الموصلية (S)، R: المقاومة (Ω)</p>
+                <p>λᵢ: الناقلية المولية الأيونية، [Xᵢ]: تركيز الأيون</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚖️ قانون التوازن الكيميائي</h2>
+            <p>ثابت التوازن والتفاعلات الانعكاسية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    aA + bB ⇌ cC + dD
+                    <br>
+                    K = ([C]ᶜ[D]ᵈ)/([A]ᵃ[B]ᵇ)
+                    <br>
+                    Qr = K (عند التوازن)
+                </div>
+                <p>K: ثابت التوازن، Qr: حاصل التفاعل</p>
+                <p>إذا Qr < K: التفاعل يتجه نحو اليمين</p>
+                <p>إذا Qr > K: التفاعل يتجه نحو اليسار</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🧬 قانون معايرة حمض-قاعدة</h2>
+            <p>المعايرة الحمضية القاعدية ونقطة التكافؤ.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    nA = nB (عند نقطة التكافؤ)
+                    <br>
+                    CAVA = CBVB
+                </div>
+                <p>CA: تركيز الحمض، VA: حجم الحمض</p>
+                <p>CB: تركيز القاعدة، VB: حجم القاعدة</p>
+                <p>عند نقطة التكافؤ: عدد مولات الحمض = عدد مولات القاعدة</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚗️ قانون سرعة التفاعل</h2>
+            <p>قياس سرعة التفاعلات الكيميائية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    v = -d[A]/dt = d[P]/dt
+                    <br>
+                    v = k[A]ᵃ[B]ᵇ
+                </div>
+                <p>v: سرعة التفاعل (mol/(L·s))</p>
+                <p>k: ثابت سرعة التفاعل</p>
+                <p>[A], [B]: تراكيز المواد المتفاعلة</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌡️ قانون الذوبانية</h2>
+            <p>حاصل الإذابة والمحاليل المشبعة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    Ks = [Aᵐ⁺]ᵃ[Bⁿ⁻]ᵇ
+                    <br>
+                    AₐBᵦ ⇌ aAᵐ⁺ + bBⁿ⁻
+                </div>
+                <p>Ks: حاصل الإذابة (ثابت عند درجة حرارة معينة)</p>
+                <p>إذا Qr > Ks: يحدث ترسيب</p>
+                <p>إذا Qr < Ks: المحلول غير مشبع</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔥 قانون الحرارة الكمونية</h2>
+            <p>الطاقة المتبادلة في التفاعلات الكيميائية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    Q = m × c × ΔT
+                    <br>
+                    ΔH = Σ(ΔHf النواتج) - Σ(ΔHf المتفاعلات)
+                </div>
+                <p>Q: كمية الحرارة (J)، m: الكتلة، c: الحرارة النوعية</p>
+                <p>ΔH: تغير الأنتالبيا (kJ/mol)</p>
+                <p>ΔH < 0: تفاعل ناشر للحرارة</p>
+                <p>ΔH > 0: تفاعل ماص للحرارة</p>
+            </div>
+        </section>
+
+        <section class="section" style="border: 3px solid #FF6B9D;">
+            <h2>📐 قوانين المنهج الجزائري - الرياضيات</h2>
+            <p style="color: #FF6B9D; font-size: 1.3em; font-weight: bold;">القوانين الرياضية المهمة للمنهج الجزائري</p>
+        </section>
+
+        <section class="section">
+            <h2>📊 المتتاليات العددية</h2>
+            <p>المتتاليات الحسابية والهندسية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    المتتالية الحسابية: Un = U₀ + n×r
+                    <br>
+                    Sn = (n+1)(U₀ + Un)/2
+                    <br><br>
+                    المتتالية الهندسية: Un = U₀ × qⁿ
+                    <br>
+                    Sn = U₀(1-qⁿ⁺¹)/(1-q)
+                </div>
+                <p>r: أساس المتتالية الحسابية (الفرق)</p>
+                <p>q: أساس المتتالية الهندسية (النسبة)</p>
+                <p>Sn: مجموع n+1 حد أول</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>∫ حساب التكامل</h2>
+            <p>التكاملات الأساسية والمساحات.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ∫xⁿdx = xⁿ⁺¹/(n+1) + C
+                    <br>
+                    ∫(1/x)dx = ln|x| + C
+                    <br>
+                    ∫eˣdx = eˣ + C
+                    <br>
+                    ∫cos(x)dx = sin(x) + C
+                    <br>
+                    ∫sin(x)dx = -cos(x) + C
+                </div>
+                <p>C: ثابت التكامل</p>
+                <p>∫ᵃᵇf(x)dx: التكامل المحدود من a إلى b</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>d/dx الاشتقاق</h2>
+            <p>مشتقات الدوال الأساسية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    (xⁿ)' = n×xⁿ⁻¹
+                    <br>
+                    (eˣ)' = eˣ
+                    <br>
+                    (ln x)' = 1/x
+                    <br>
+                    (sin x)' = cos x
+                    <br>
+                    (cos x)' = -sin x
+                    <br>
+                    (u×v)' = u'v + uv'
+                    <br>
+                    (u/v)' = (u'v - uv')/v²
+                </div>
+                <p>قواعد الاشتقاق الأساسية للدوال</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📈 الدوال الأسية واللوغاريتمية</h2>
+            <p>خصائص وقوانين الدوال الأسية واللوغاريتمية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    eᵃ × eᵇ = eᵃ⁺ᵇ
+                    <br>
+                    eᵃ / eᵇ = eᵃ⁻ᵇ
+                    <br>
+                    (eᵃ)ᵇ = eᵃˣᵇ
+                    <br><br>
+                    ln(a×b) = ln(a) + ln(b)
+                    <br>
+                    ln(a/b) = ln(a) - ln(b)
+                    <br>
+                    ln(aⁿ) = n×ln(a)
+                    <br>
+                    eˡⁿ⁽ˣ⁾ = x
+                    <br>
+                    ln(eˣ) = x
+                </div>
+                <p>الخصائص الأساسية للأسس واللوغاريتمات</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔺 الأعداد المركبة</h2>
+            <p>الشكل الجبري والشكل الأسي للأعداد المركبة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    z = a + ib = |z|e^(iθ)
+                    <br>
+                    |z| = √(a² + b²)
+                    <br>
+                    θ = arg(z) = arctan(b/a)
+                    <br>
+                    z̄ = a - ib (المرافق)
+                    <br>
+                    z × z̄ = |z|²
+                    <br>
+                    e^(iθ) = cos(θ) + i sin(θ)
+                </div>
+                <p>i² = -1، z: عدد مركب</p>
+                <p>a: الجزء الحقيقي، b: الجزء التخيلي</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📊 الاحتمالات والإحصاء</h2>
+            <p>القوانين الأساسية في الاحتمالات.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    P(A∪B) = P(A) + P(B) - P(A∩B)
+                    <br>
+                    P(A|B) = P(A∩B)/P(B)
+                    <br>
+                    E(X) = Σxᵢ × P(xᵢ)
+                    <br>
+                    V(X) = E(X²) - [E(X)]²
+                    <br>
+                    σ = √V(X)
+                </div>
+                <p>P: احتمال، E(X): الأمل الرياضي</p>
+                <p>V(X): التباين، σ: الانحراف المعياري</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎯 حساب المثلثات</h2>
+            <p>المتطابقات المثلثية الأساسية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    sin²(x) + cos²(x) = 1
+                    <br>
+                    1 + tan²(x) = 1/cos²(x)
+                    <br>
+                    sin(2x) = 2sin(x)cos(x)
+                    <br>
+                    cos(2x) = cos²(x) - sin²(x)
+                    <br>
+                    cos(a+b) = cos(a)cos(b) - sin(a)sin(b)
+                    <br>
+                    sin(a+b) = sin(a)cos(b) + cos(a)sin(b)
+                </div>
+                <p>المتطابقات المثلثية الشهيرة</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📐 الهندسة الفضائية</h2>
+            <p>الحجوم والمساحات في الفضاء.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    الكرة: V = (4/3)πR³، A = 4πR²
+                    <br>
+                    الأسطوانة: V = πR²h، A = 2πRh + 2πR²
+                    <br>
+                    المخروط: V = (1/3)πR²h، A = πRℓ + πR²
+                    <br>
+                    متوازي المستطيلات: V = L×l×h
+                </div>
+                <p>V: الحجم، A: المساحة الجانبية</p>
+                <p>R: نصف القطر، h: الارتفاع، ℓ: الراسم</p>
+            </div>
+        </section>
+
+        <section class="section" style="border: 3px solid #FFA500;">
+            <h2>🔬 قوانين فيزيائية متقدمة</h2>
+            <p style="color: #FFA500; font-size: 1.3em; font-weight: bold;">قوانين إضافية مهمة في الفيزياء</p>
+        </section>
+
+        <section class="section">
+            <h2>🌡️ قوانين الديناميكا الحرارية</h2>
+            <p>القوانين الأساسية التي تحكم الحرارة والطاقة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    القانون الأول: ΔU = Q - W
+                    <br>
+                    القانون الثاني: ΔS ≥ 0
+                    <br>
+                    القانون الثالث: S → 0 عندما T → 0
+                    <br>
+                    كفاءة كارنو: η = 1 - Tc/Th
+                </div>
+                <p>ΔU: التغير في الطاقة الداخلية، Q: الحرارة، W: الشغل</p>
+                <p>S: الإنتروبيا، Tc: درجة حرارة المصدر البارد، Th: درجة حرارة المصدر الساخن</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>💡 قوانين الضوء والبصريات</h2>
+            <p>قوانين انكسار وانعكاس الضوء.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    قانون سنيل: n₁sin(θ₁) = n₂sin(θ₂)
+                    <br>
+                    قانون العدسات: 1/f = 1/d₀ + 1/dᵢ
+                    <br>
+                    التكبير: G = -dᵢ/d₀ = hᵢ/h₀
+                    <br>
+                    معامل الانكسار: n = c/v
+                </div>
+                <p>n: معامل الانكسار، θ: زاوية السقوط/الانكسار</p>
+                <p>f: البعد البؤري، d₀: بعد الجسم، dᵢ: بعد الصورة</p>
+                <p>c: سرعة الضوء في الفراغ، v: سرعة الضوء في الوسط</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📻 قوانين الموجات</h2>
+            <p>خصائص الموجات الميكانيكية والكهرومغناطيسية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    v = λ × f
+                    <br>
+                    T = 1/f
+                    <br>
+                    y(x,t) = A sin(kx - ωt + φ)
+                    <br>
+                    k = 2π/λ (العدد الموجي)
+                    <br>
+                    ω = 2πf (السرعة الزاوية)
+                </div>
+                <p>v: سرعة الموجة، λ: الطول الموجي، f: التردد</p>
+                <p>A: السعة، k: العدد الموجي، ω: التردد الزاوي، φ: طور الموجة</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚡ قوانين الدوائر الكهربائية المتقدمة</h2>
+            <p>قوانين كيرشوف والمكثفات والوشائع.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    قانون كيرشوف الأول: ΣI = 0 (عند العقدة)
+                    <br>
+                    قانون كيرشوف الثاني: ΣU = 0 (في الحلقة)
+                    <br>
+                    المكثف: Q = C×U، W = ½CU²
+                    <br>
+                    الوشيعة: U = L×(dI/dt)، W = ½LI²
+                    <br>
+                    التيار المتناوب: i(t) = I₀sin(ωt + φ)
+                </div>
+                <p>C: السعة (F)، L: معامل الحث الذاتي (H)</p>
+                <p>Q: الشحنة، W: الطاقة المخزنة</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔊 قوانين الصوت والأمواج الصوتية</h2>
+            <p>خصائص الموجات الصوتية وتأثير دوبلر.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    شدة الصوت: I = P/A
+                    <br>
+                    مستوى الشدة: L = 10log(I/I₀) dB
+                    <br>
+                    تأثير دوبلر: f' = f × (v±v₀)/(v±vs)
+                    <br>
+                    سرعة الصوت: v ≈ 340 m/s (في الهواء)
+                </div>
+                <p>I: شدة الصوت (W/m²)، I₀ = 10⁻¹² W/m² (عتبة السمع)</p>
+                <p>f': التردد الملاحظ، v₀: سرعة المراقب، vs: سرعة المصدر</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌀 قوانين الموائع</h2>
+            <p>الضغط والطفو وسريان الموائع.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    الضغط: P = F/A = ρgh
+                    <br>
+                    قانون أرخميدس: FA = ρgV
+                    <br>
+                    معادلة برنولي: P + ½ρv² + ρgh = ثابت
+                    <br>
+                    معادلة الاستمرارية: A₁v₁ = A₂v₂
+                </div>
+                <p>P: الضغط (Pa)، ρ: الكثافة (kg/m³)، g: تسارع الجاذبية</p>
+                <p>FA: قوة الدفع، V: حجم الجسم المغمور</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌊 قوانين الاهتزازات والبندول</h2>
+            <p>الحركة التوافقية البسيطة والبندولات.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    x(t) = A cos(ωt + φ)
+                    <br>
+                    البندول البسيط: T = 2π√(L/g)
+                    <br>
+                    النابض: T = 2π√(m/k)
+                    <br>
+                    الطاقة: E = ½kA² = ½mω²A²
+                </div>
+                <p>A: السعة، ω: التردد الزاوي، φ: الطور الابتدائي</p>
+                <p>L: طول البندول، k: ثابت النابض</p>
+            </div>
+        </section>
+
+        <section class="section" style="border: 3px solid #9D4EDD;">
+            <h2>🧬 قوانين كيميائية متقدمة</h2>
+            <p style="color: #9D4EDD; font-size: 1.3em; font-weight: bold;">قوانين إضافية مهمة في الكيمياء</p>
+        </section>
+
+        <section class="section">
+            <h2>⚗️ قوانين الحركية الكيميائية</h2>
+            <p>قوانين سرعة التفاعل ونصف العمر.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    تفاعل من الرتبة الأولى: ln[A]t = ln[A]₀ - kt
+                    <br>
+                    نصف العمر: t₁/₂ = ln(2)/k = 0.693/k
+                    <br>
+                    معادلة أرهينيوس: k = Ae^(-Ea/RT)
+                    <br>
+                    زمن التفاعل: t = (1/k)ln([A]₀/[A]t)
+                </div>
+                <p>k: ثابت السرعة، [A]t: التركيز في الزمن t</p>
+                <p>Ea: طاقة التنشيط، A: معامل التكرار، R: ثابت الغازات</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔋 قوانين الكيمياء الكهربائية</h2>
+            <p>التحليل الكهربائي وقوانين فاراداي.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    قانون فاراداي الأول: m = (M×I×t)/(n×F)
+                    <br>
+                    الشحنة: Q = I × t = n × F
+                    <br>
+                    جهد الخلية: E° = E°(cathode) - E°(anode)
+                    <br>
+                    معادلة نرنست: E = E° - (RT/nF)ln(Q)
+                </div>
+                <p>m: الكتلة المترسبة (g)، M: الكتلة المولية</p>
+                <p>n: عدد الإلكترونات، F = 96500 C/mol (ثابت فاراداي)</p>
+                <p>Q: الشحنة الكهربائية (C)</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌡️ قوانين الديناميكا الحرارية الكيميائية</h2>
+            <p>الأنتالبيا والإنتروبيا وطاقة جيبس.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ΔG° = ΔH° - TΔS°
+                    <br>
+                    ΔG° = -RTln(K)
+                    <br>
+                    قانون هس: ΔH°réaction = ΣΔH°(produits) - ΣΔH°(réactifs)
+                    <br>
+                    العلاقة: ΔG < 0 → تفاعل تلقائي
+                </div>
+                <p>ΔG°: طاقة جيبس القياسية، ΔH°: الأنتالبيا القياسية</p>
+                <p>ΔS°: الإنتروبيا القياسية، K: ثابت التوازن</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>💧 قوانين الضغط البخاري والغليان</h2>
+            <p>العلاقات بين الضغط ودرجة الحرارة للسوائل.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    معادلة كلابيرون-كلاوزيوس: ln(P₂/P₁) = -(ΔHvap/R)(1/T₂ - 1/T₁)
+                    <br>
+                    قانون راؤول: P = X × P°
+                    <br>
+                    الارتفاع في درجة الغليان: ΔTb = Kb × m
+                </div>
+                <p>ΔHvap: حرارة التبخر، P: الضغط البخاري</p>
+                <p>X: الكسر المولي، m: المولالية</p>
+                <p>Kb: ثابت الارتفاع في درجة الغليان</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚖️ قوانين الكيمياء العضوية</h2>
+            <p>التسمية والصيغ الكيميائية للمركبات العضوية.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    الألكانات: CnH2n+2
+                    <br>
+                    الألكينات: CnH2n
+                    <br>
+                    الألكاينات: CnH2n-2
+                    <br>
+                    البنزين: C6H6
+                    <br>
+                    الكحولات: R-OH
+                    <br>
+                    الألدهيدات: R-CHO
+                    <br>
+                    الكيتونات: R-CO-R'
+                </div>
+                <p>الصيغ العامة للمركبات العضوية الأساسية</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🧪 قوانين التأكسد والاختزال</h2>
+            <p>الأعداد التأكسدية وموازنة المعادلات.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    التأكسد: فقدان إلكترونات (زيادة عدد التأكسد)
+                    <br>
+                    الاختزال: كسب إلكترونات (نقصان عدد التأكسد)
+                    <br>
+                    عدد الإلكترونات المفقودة = عدد الإلكترونات المكتسبة
+                    <br>
+                    nox(H) = +1، nox(O) = -2
+                </div>
+                <p>المؤكسِد: المادة التي تختزل (تكتسب إلكترونات)</p>
+                <p>المُختزِل: المادة التي تتأكسد (تفقد إلكترونات)</p>
+            </div>
+        </section>
+
+        <section class="section" style="border: 3px solid #06FFA5;">
+            <h2>📐 قوانين رياضية إضافية</h2>
+            <p style="color: #06FFA5; font-size: 1.3em; font-weight: bold;">المزيد من القوانين الرياضية المهمة</p>
+        </section>
+
+        <section class="section">
+            <h2>📊 نهايات الدوال</h2>
+            <p>نهايات الدوال الشهيرة والصيغ غير المحددة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    lim(x→0) (sin x)/x = 1
+                    <br>
+                    lim(x→0) (1-cos x)/x = 0
+                    <br>
+                    lim(x→∞) (1 + 1/x)ˣ = e
+                    <br>
+                    lim(x→0) (eˣ - 1)/x = 1
+                    <br>
+                    lim(x→0) (ln(1+x))/x = 1
+                </div>
+                <p>النهايات الشهيرة المستخدمة في حل المسائل</p>
+                <p>الصيغ غير المحددة: 0/0، ∞/∞، 0×∞، ∞-∞</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>∫ تطبيقات التكامل</h2>
+            <p>حساب المساحات والحجوم بالتكامل.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    المساحة: A = ∫ᵃᵇ f(x)dx
+                    <br>
+                    الحجم (دوران حول Ox): V = π∫ᵃᵇ [f(x)]²dx
+                    <br>
+                    طول القوس: L = ∫ᵃᵇ √(1 + [f'(x)]²)dx
+                    <br>
+                    التكامل بالتجزئة: ∫udv = uv - ∫vdu
+                </div>
+                <p>تطبيقات التكامل في الهندسة والفيزياء</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎲 التوافيق والتباديل</h2>
+            <p>حساب الاحتمالات والترتيبات.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    التباديل: A(n,p) = n!/(n-p)!
+                    <br>
+                    التوافيق: C(n,p) = n!/[p!(n-p)!]
+                    <br>
+                    ذات الحدين: (a+b)ⁿ = Σ C(n,k)aⁿ⁻ᵏbᵏ
+                    <br>
+                    n! = n×(n-1)×(n-2)×...×2×1
+                </div>
+                <p>التباديل: الترتيب مهم</p>
+                <p>التوافيق: الترتيب غير مهم</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📈 المعادلات التفاضلية</h2>
+            <p>حل المعادلات التفاضلية البسيطة.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    y' + ay = 0 ⟹ y = Ce⁻ᵃˣ
+                    <br>
+                    y' + ay = b ⟹ y = b/a + Ce⁻ᵃˣ
+                    <br>
+                    y' = ky ⟹ y = y₀eᵏˣ
+                    <br>
+                    y'' + ω²y = 0 ⟹ y = Acos(ωx) + Bsin(ωx)
+                </div>
+                <p>المعادلات التفاضلية من الرتبة الأولى والثانية</p>
+                <p>C، A، B: ثوابت التكامل</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔢 المصفوفات والمحددات</h2>
+            <p>العمليات على المصفوفات وحساب المحددات.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    det(A) لمصفوفة 2×2: ad - bc
+                    <br>
+                    A⁻¹ = (1/det(A)) × adj(A)
+                    <br>
+                    det(AB) = det(A) × det(B)
+                    <br>
+                    det(kA) = kⁿ det(A)
+                </div>
+                <p>المحدد: عدد يميز المصفوفة</p>
+                <p>A⁻¹: المصفوفة المعكوسة (إذا كان det(A) ≠ 0)</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📐 الهندسة التحليلية</h2>
+            <p>المعادلات الهندسية في المستوي والفضاء.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    المسافة بين نقطتين: d = √[(x₂-x₁)² + (y₂-y₁)²]
+                    <br>
+                    معادلة المستقيم: y = mx + b
+                    <br>
+                    الدائرة: (x-a)² + (y-b)² = r²
+                    <br>
+                    القطع المكافئ: y² = 4px
+                    <br>
+                    القطع الناقص: x²/a² + y²/b² = 1
+                </div>
+                <p>m: الميل، b: نقطة التقاطع مع المحور y</p>
+                <p>(a,b): مركز الدائرة، r: نصف القطر</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌠 معادلة جينز للكتلة الحرجة لتكون النجوم</h2>
+            <p>كم من الغاز يحتاج لينهار تحت جاذبيته ويولد نجماً جديداً؟</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    MJ = (5kBT/GμmH)^(3/2) × (3/4πρ)^(1/2)
+                </div>
+                <p>كتلة جينز - الحد الأدنى لتكوين نجم من سحابة غازية</p>
+                <p>سحب الغاز الأثقل من هذا الحد تنهار لتشكل نجوماً جديدة!</p>
+            </div>
+        </section>
+
+        <section class="section" style="border: 3px solid #FF1493;">
+            <h2>🧠 الفلاسفة والعلماء العظام</h2>
+            <p style="color: #FF1493; font-size: 1.3em; font-weight: bold;">عقول غيّرت فهمنا للكون والوجود</p>
+        </section>
+
+        <section class="section">
+            <h2>🌟 أرسطو - فيلسوف الطبيعة</h2>
+            <p>أرسطو (384-322 ق.م) - الفيلسوف اليوناني الذي وضع أسس الفيزياء والمنطق.</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    "الكل أعظم من مجموع أجزائه"
+                    <br><br>
+                    "الطبيعة لا تفعل شيئاً عبثاً"
+                </div>
+                <p>أسس المنطق الصوري ووضع نظرية الأسباب الأربعة</p>
+                <p>نظريته: كل حركة تحتاج إلى محرك - بداية علم الديناميك</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📐 فيثاغورس - فيلسوف الأعداد</h2>
+            <p>فيثاغورس (570-495 ق.م) - "الأعداد تحكم الكون"</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    a² + b² = c² (نظرية فيثاغورس)
+                    <br><br>
+                    "كل شيء في الكون يمكن التعبير عنه بالأعداد"
+                </div>
+                <p>اكتشف العلاقة بين الموسيقى والرياضيات</p>
+                <p>أول من قال: الأرض كروية والكواكب تتحرك في مسارات دائرية!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔭 جاليليو جاليلي - أبو العلم الحديث</h2>
+            <p>جاليليو (1564-1642) - أول من استخدم التلسكوب لدراسة السماء</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    s = ½gt² (قانون السقوط الحر)
+                    <br><br>
+                    "الرياضيات هي اللغة التي كتب بها الله الكون"
+                </div>
+                <p>اكتشف أقمار المشتري وحلقات زحل وأطوار الزهرة</p>
+                <p>أثبت أن كل الأجسام تسقط بنفس السرعة بغض النظر عن كتلتها!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🍎 إسحاق نيوتن - عملاق الفيزياء</h2>
+            <p>نيوتن (1643-1727) - وضع أسس الميكانيكا الكلاسيكية وحساب التفاضل والتكامل</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    F = ma
+                    <br>
+                    F = G(m₁m₂)/r²
+                    <br><br>
+                    "إذا رأيت أبعد من الآخرين، فلأنني وقفت على أكتاف العمالقة"
+                </div>
+                <p>وحّد فيزياء الأرض والسماء في قوانين واحدة</p>
+                <p>اخترع التلسكوب العاكس وحلل الضوء إلى ألوان الطيف</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚡ ألبرت أينشتاين - ثوري الفيزياء</h2>
+            <p>أينشتاين (1879-1955) - غيّر فهمنا للزمان والمكان والجاذبية</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    E = mc²
+                    <br>
+                    Gμν = (8πG/c⁴)Tμν
+                    <br><br>
+                    "الخيال أهم من المعرفة"
+                    <br>
+                    "الله لا يلعب النرد بالكون"
+                </div>
+                <p>النسبية الخاصة: لا شيء أسرع من الضوء، الزمن نسبي</p>
+                <p>النسبية العامة: الجاذبية هي انحناء الزمكان نفسه!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌊 نيلز بور - مهندس ميكانيكا الكم</h2>
+            <p>بور (1885-1962) - أول من فسر بنية الذرة بنموذج كمومي</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    L = nℏ (تكميم الزخم الزاوي)
+                    <br>
+                    E = -13.6/n² eV
+                    <br><br>
+                    "من لم تصدمه ميكانيكا الكم في المرة الأولى لم يفهمها"
+                </div>
+                <p>مبدأ التكامل: الموجة والجسيم وجهان لحقيقة واحدة</p>
+                <p>فسر طيف الهيدروجين وأسس معهد كوبنهاغن الشهير</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎭 إيرفين شرودنغر - شاعر الفيزياء الكمومية</h2>
+            <p>شرودنغر (1887-1961) - صاحب أشهر معادلة في ميكانيكا الكم</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    iℏ∂ψ/∂t = Ĥψ
+                    <br><br>
+                    "قطة شرودنغر: حية وميتة في نفس الوقت حتى نراقبها!"
+                </div>
+                <p>معادلته تصف كل شيء في العالم الكمومي</p>
+                <p>كتابه "ما هي الحياة؟" ألهم اكتشاف DNA!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚛️ ريتشارد فاينمان - ساحر الفيزياء</h2>
+            <p>فاينمان (1918-1988) - عبقري الكهروديناميك الكمي وأعظم مُعلم</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ∫e^(iS/ℏ)𝒟x (تكامل المسار)
+                    <br><br>
+                    "إذا كنت تظن أنك فهمت ميكانيكا الكم، فأنت لم تفهمها"
+                    <br>
+                    "الطبيعة لا يمكن خداعها"
+                </div>
+                <p>اخترع مخططات فاينمان لتبسيط حسابات الجسيمات</p>
+                <p>حائز على نوبل في الفيزياء وعازف بونغو محترف!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌌 ستيفن هوكينج - فارس الثقوب السوداء</h2>
+            <p>هوكينج (1942-2018) - أثبت أن الثقوب السوداء ليست سوداء تماماً</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    T = ℏc³/(8πGMkB) (إشعاع هوكينج)
+                    <br>
+                    S = kBc³A/(4ℏG) (إنتروبيا الثقب الأسود)
+                    <br><br>
+                    "الذكاء هو القدرة على التكيف مع التغيير"
+                </div>
+                <p>اكتشف أن الثقوب السوداء تتبخر ببطء شديد</p>
+                <p>كتابه "تاريخ موجز للزمن" باع 10 ملايين نسخة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🧬 ماري كوري - رائدة النشاط الإشعاعي</h2>
+            <p>ماري كوري (1867-1934) - أول امرأة تحصل على نوبل والوحيدة في مجالين</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    A = λN (قانون الاضمحلال الإشعاعي)
+                    <br><br>
+                    "لا شيء في الحياة يُخاف منه، بل يُفهم فقط"
+                    <br>
+                    "كن أقل فضولاً عن الناس وأكثر فضولاً عن الأفكار"
+                </div>
+                <p>اكتشفت الراديوم والبولونيوم - عنصران جديدان</p>
+                <p>نوبل في الفيزياء (1903) ونوبل في الكيمياء (1911)</p>
+            </div>
+        </section>
+
+        <section class="section" style="border: 3px solid #00CED1;">
+            <h2>🔬 معادلات فيزيائية متقدمة جداً</h2>
+            <p style="color: #00CED1; font-size: 1.3em; font-weight: bold;">المعادلات التي تصف أعمق أسرار الكون</p>
+        </section>
+
+        <section class="section">
+            <h2>🌀 معادلة يانغ-ميلز - نظرية المعايرة</h2>
+            <p>أساس النموذج القياسي للجسيمات - واحدة من أصعب معادلات الفيزياء!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    Fμν = ∂μAν - ∂νAμ - ig[Aμ, Aν]
+                    <br>
+                    ℒYM = -¼FμνᵃFᵃμν
+                </div>
+                <p>تصف القوى النووية القوية والضعيفة</p>
+                <p>مشكلة الألفية: إثبات وجود فجوة الكتلة - جائزة مليون دولار!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎻 نظرية الأوتار - كل شيء اهتزازات</h2>
+            <p>الكون مصنوع من أوتار صغيرة تهتز - نظرية كل شيء المحتملة!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    S = (1/2πα') ∫d²σ√(-γ)γᵃᵇ∂ₐXμ∂ᵦXμ
+                    <br><br>
+                    نحتاج 10 أو 11 بُعداً للزمكان!
+                </div>
+                <p>الجسيمات ليست نقاطاً بل أوتار تهتز</p>
+                <p>الجاذبية الكمومية قد تُحل بنظرية الأوتار - حلم أينشتاين!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌌 معادلة ويلر-ديويت - الكون الموجي</h2>
+            <p>وصف كمومي للكون بأكمله - لا زمن في هذه المعادلة!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ĤΨ[gᵢⱼ] = 0
+                    <br>
+                    (Gᵢⱼₖₗπⁱʲπᵏˡ - √g³R)Ψ = 0
+                </div>
+                <p>الكون كله هو دالة موجية واحدة عملاقة</p>
+                <p>مشكلة الزمن: الزمن يختفي في الجاذبية الكمومية!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚛️ معادلة كلاين-غوردون النسبية</h2>
+            <p>النسخة النسبية من معادلة شرودنغر للجسيمات بدون سبين</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    (∂μ∂μ + m²c²/ℏ²)ψ = 0
+                    <br>
+                    (□ + m²c²/ℏ²)ψ = 0
+                </div>
+                <p>تصف الجسيمات القياسية (بوزونات هيغز، ميزونات)</p>
+                <p>أول محاولة لدمج النسبية الخاصة مع ميكانيكا الكم</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔮 معادلة بروكا-سيليغمان للانتقالات الطورية</h2>
+            <p>كيف تتحول المواد من حالة لأخرى - من الماء إلى الثلج!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    F = -kBT ln(Z)
+                    <br>
+                    Z = Σ e^(-βEᵢ)
+                </div>
+                <p>F: الطاقة الحرة، Z: دالة التقسيم الإحصائية</p>
+                <p>تفسر لماذا الثلج يذوب والماء يتبخر عند درجات حرارة معينة</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌊 معادلة نافيير-ستوكس - ديناميكا الموائع</h2>
+            <p>تصف حركة السوائل والغازات - من الطقس إلى الأعاصير!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ρ(∂v/∂t + v·∇v) = -∇p + μ∇²v + f
+                </div>
+                <p>مشكلة الألفية الثانية: هل للحلول انتظام دائماً؟</p>
+                <p>تستخدم في التنبؤ بالطقس، تصميم الطائرات، وفهم تدفق الدم</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚡ معادلات ماكسويل الكاملة في شكل تنسوري</h2>
+            <p>الصيغة الأنيقة للكهرومغناطيسية في النسبية الخاصة</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ∂μFμν = (4π/c)Jν
+                    <br>
+                    ∂λFμν + ∂μFνλ + ∂νFλμ = 0
+                </div>
+                <p>Fμν: تنسور المجال الكهرومغناطيسي</p>
+                <p>توحد الكهرباء والمغناطيسية في كيان رباعي الأبعاد واحد</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🎲 معادلة فوكر-بلانك - العشوائية والاحتمالات</h2>
+            <p>كيف تتطور الأنظمة الفيزيائية عشوائياً عبر الزمن</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ∂P/∂t = -∂/∂x[μ(x,t)P] + ½∂²/∂x²[σ²(x,t)P]
+                </div>
+                <p>تصف الحركة البراونية وانتشار الجسيمات</p>
+                <p>تُستخدم في الفيزياء، الكيمياء، البيولوجيا، والمالية!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌟 معادلة TOV الكاملة للنجوم النيوترونية</h2>
+            <p>المعادلة التي تصف أكثر المواد كثافة في الكون!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    dP/dr = -G(ρ + P/c²)(m + 4πr³P/c²) / [r(r - 2Gm/c²)]
+                </div>
+                <p>معادلة تولمان-أوبنهايمر-فولكوف النسبية</p>
+                <p>ملعقة واحدة من نجم نيوتروني تزن مليار طن!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔥 معادلة هايزنبرغ للحركة في ميكانيكا الكم</h2>
+            <p>كيف تتطور المؤثرات الكمومية عبر الزمن</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    dÂ/dt = (i/ℏ)[Ĥ, Â] + ∂Â/∂t
+                </div>
+                <p>صيغة هايزنبرغ لميكانيكا الكم</p>
+                <p>الحالات ثابتة والمؤثرات هي التي تتطور - عكس صيغة شرودنغر!</p>
+            </div>
+        </section>
+
+        <section class="section" style="border: 3px solid #FFD700;">
+            <h2>🧪 معادلات كيميائية متقدمة</h2>
+            <p style="color: #FFD700; font-size: 1.3em; font-weight: bold;">الكيمياء الكمومية والديناميكا الحرارية المتقدمة</p>
+        </section>
+
+        <section class="section">
+            <h2>🌀 معادلة شرودنغر الجزيئية - الكيمياء الكمومية</h2>
+            <p>معادلة شرودنغر للجزيئات - أساس الكيمياء الحديثة!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    [-ℏ²/2m ∇² + V(r)]ψ = Eψ
+                    <br>
+                    تقريب بورن-أوبنهايمر: فصل حركة الإلكترونات عن النوى
+                </div>
+                <p>كل رابطة كيميائية هي ظاهرة كمومية</p>
+                <p>حساب طاقة الجزيئات وأشكالها بدقة عالية</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚛️ نظرية المدارات الجزيئية - LCAO</h2>
+            <p>كيف تتشكل الروابط الكيميائية على المستوى الكمومي</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ψMO = Σcᵢφᵢ (التجميع الخطي للمدارات الذرية)
+                    <br>
+                    ترتيب الروابط = (Ne - Na)/2
+                </div>
+                <p>المدارات الجزيئية: σ، π، δ (رابطة)، σ*، π*، δ* (مضادة للرابطة)</p>
+                <p>تفسر لماذا O₂ مغناطيسي وN₂ ثلاثي الروابط!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🔬 معادلة بيلوسوف-جابوتنسكي - التفاعلات المتذبذبة</h2>
+            <p>تفاعلات كيميائية تتذبذب بين الألوان - الكيمياء الحية!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    dx/dt = k₁ay - k₂xy + k₃ax - 2k₄x²
+                    <br>
+                    dy/dt = -k₁ay - k₂xy + fk₅bz
+                </div>
+                <p>المحلول يتحول من أحمر لأزرق وبالعكس بشكل دوري!</p>
+                <p>نموذج للتفاعلات البيولوجية مثل دقات القلب</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌡️ معادلة فان دير فالس للغازات الحقيقية</h2>
+            <p>تصحيح قانون الغازات المثالية - الجزيئات لها حجم وتتجاذب!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    [P + a(n/V)²](V - nb) = nRT
+                    <br>
+                    Pc = a/(27b²)، Tc = 8a/(27Rb)
+                </div>
+                <p>a: تصحيح قوى التجاذب بين الجزيئات</p>
+                <p>b: تصحيح حجم الجزيئات نفسها</p>
+                <p>تفسر السيولة والتحولات الطورية للغازات</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>💎 معادلة براج للحيود في البلورات - بنية المواد</h2>
+            <p>كيف نرى ترتيب الذرات داخل البلورات بالأشعة السينية</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    2d sinθ = nλ (قانون براغ)
+                    <br>
+                    I ∝ |F(hkl)|² (شدة الحيود)
+                </div>
+                <p>d: المسافة بين مستويات البلورة، (hkl): مؤشرات ميلر</p>
+                <p>بهذه الطريقة اكتشفنا بنية DNA والبروتينات والأدوية!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🧬 معادلة ميكايليس-مينتن - حركية الإنزيمات</h2>
+            <p>كيف تعمل الإنزيمات - محفزات الحياة البيولوجية</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    v = (Vmax[S])/(Km + [S])
+                    <br>
+                    E + S ⇌ ES → E + P
+                </div>
+                <p>Vmax: السرعة القصوى، Km: ثابت ميكايليس (ألفة الإنزيم)</p>
+                <p>تفسر كيف تسرّع الإنزيمات التفاعلات مليون مرة!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>⚡ معادلة بتلر-فولمر - الكيمياء الكهربائية المتقدمة</h2>
+            <p>كيف تتم التفاعلات على أسطح الأقطاب الكهربائية</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    i = i₀[e^(αnFη/RT) - e^(-(1-α)nFη/RT)]
+                </div>
+                <p>i: كثافة التيار، i₀: تيار التبادل، η: جهد التجاوز</p>
+                <p>α: معامل النقل (0.5 عادة)</p>
+                <p>أساس فهم البطاريات والوقود الخلوي والتآكل</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>🌈 نظرية المجال البلوري - ألوان المركبات التساندية</h2>
+            <p>لماذا معقدات الحديد حمراء والنحاس زرقاء؟</p>
+            
+            <div class="equation-box">
+
+        <section class="section">
+            <h2>✨ معادلة مقياس بلانك - أصغر وحدات الكون</h2>
+            <p>الحدود الأساسية للطول والزمن والطاقة في الكون!</p>
+            
+            <div class="equation-box">
+                <div class="math-formula">
+                    ℓP = √(ℏG/c³) ≈ 1.6×10⁻³⁵ m
+                    <br>
+                    tP = √(ℏG/c⁵) ≈ 5.4×10⁻⁴⁴ s
+                </div>
+                <p>طول بلانك وزمن بلانك - أصغر من ذلك، قوانين الفيزياء لا تعمل!</p>
+                <p>لا يمكن قياس أي شيء أصغر من طول بلانك - الحد المطلق للواقع!</p>
+            </div>
+        </section>
+
+        <footer>
+            <p class="creator">صانع الموقع: يوسف محمد بوخالفة</p>
+            <p style="margin-top: 20px; color: #a0a0ff;">✨ حيث تلتقي الرياضيات بجمال الكون ✨</p>
+        </footer>
+    </div>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Create trail
+            if (Math.random() > 0.8) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                trail.style.left = e.clientX + 'px';
+                trail.style.top = e.clientY + 'px';
+                document.body.appendChild(trail);
+                
+                setTimeout(() => trail.remove(), 1000);
+            }
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.1;
+            cursorY += (mouseY - cursorY) * 0.1;
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Starfield Canvas
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random();
+                this.twinkleSpeed = Math.random() * 0.02;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity += this.twinkleSpeed;
+                
+                if (this.opacity > 1 || this.opacity < 0) {
+                    this.twinkleSpeed *= -1;
+                }
+
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        const stars = [];
+        for (let i = 0; i < 200; i++) {
+            stars.push(new Star());
+        }
+
+        // Mouse interaction with stars
+        let mouseStarX = 0, mouseStarY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseStarX = e.clientX;
+            mouseStarY = e.clientY;
+        });
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+                
+                // Mouse interaction
+                const dx = mouseStarX - star.x;
+                const dy = mouseStarY - star.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 100) {
+                    const force = (100 - distance) / 100;
+                    star.x -= dx * force * 0.02;
+                    star.y -= dy * force * 0.02;
+                }
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Resize canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Hover effects for sections
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            section.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
